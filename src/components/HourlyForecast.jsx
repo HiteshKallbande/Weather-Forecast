@@ -1,9 +1,17 @@
 import React from 'react';
-import { Clock, Droplets, Wind } from 'lucide-react';
+import { Clock, Droplets } from 'lucide-react';
 import WeatherIcon from './WeatherIcon';
+import { useWeather } from '../context/WeatherContext';
 
 export default function HourlyForecast({ hourly, unit, accentColor }) {
+  const { isLoadingWeather } = useWeather();
   const isAmber = accentColor === 'amber';
+
+  if (isLoadingWeather && (!hourly || hourly.length === 0)) {
+    return <HourlySkeleton />;
+  }
+
+  const items = hourly || [];
 
   return (
     <div className="rounded-3xl glass-card p-6 border border-white/10">
@@ -21,7 +29,7 @@ export default function HourlyForecast({ hourly, unit, accentColor }) {
 
       {/* Horizontal Carousel */}
       <div className="flex space-x-3 overflow-x-auto pb-2 pt-1 scrollbar-thin">
-        {hourly.map((item, idx) => {
+        {items.map((item, idx) => {
           const isNow = idx === 0;
           const temp = unit === 'C' ? item.tempC : item.tempF;
 
@@ -61,6 +69,34 @@ export default function HourlyForecast({ hourly, unit, accentColor }) {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function HourlySkeleton() {
+  return (
+    <div className="rounded-3xl glass-card p-6 border border-white/10 animate-pulse">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-4 rounded bg-white/10" />
+          <div className="h-4 w-36 rounded bg-white/10" />
+        </div>
+        <div className="h-3 w-28 rounded bg-white/05" />
+      </div>
+
+      <div className="flex space-x-3 overflow-x-hidden pb-2 pt-1">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="flex-shrink-0 flex flex-col items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] w-24 h-32 space-y-2"
+          >
+            <div className="h-3 w-10 rounded bg-white/05" />
+            <div className="w-6 h-6 rounded-full bg-white/10 my-2" />
+            <div className="h-4 w-8 rounded bg-white/08" />
+            <div className="h-2.5 w-10 rounded bg-white/05" />
+          </div>
+        ))}
       </div>
     </div>
   );
