@@ -5,6 +5,8 @@ import {
   searchLocations,
   getCurrentCoordinates,
   reverseGeocode,
+  ensure24HourData,
+  calculateMoonPhase,
 } from '../services/weatherService';
 
 const WeatherContext = createContext(null);
@@ -120,7 +122,17 @@ export function WeatherProvider({ children }) {
   // 3. Active Location Weather State
   const [activeLocation, setActiveLocation] = useState(() => {
     // Start with rich mock data for Zurich so initial view is instantly populated
-    return mockLocations[0];
+    const initial = mockLocations[0];
+    return {
+      ...initial,
+      hourly: ensure24HourData(initial.hourly, initial.tempC),
+      moon: initial.moon || calculateMoonPhase(new Date()),
+      sun: {
+        ...initial.sun,
+        solarNoon: initial.sun?.solarNoon || '12:35',
+        dayLength: initial.sun?.dayLength || '11h 34m',
+      },
+    };
   });
 
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
@@ -199,7 +211,16 @@ export function WeatherProvider({ children }) {
         if (match && match.latitude && match.longitude) {
           await loadWeatherForLocation(match);
         } else {
-          setActiveLocation(loc);
+          setActiveLocation({
+            ...loc,
+            hourly: ensure24HourData(loc.hourly, loc.tempC),
+            moon: loc.moon || calculateMoonPhase(new Date()),
+            sun: {
+              ...loc.sun,
+              solarNoon: loc.sun?.solarNoon || '12:30',
+              dayLength: loc.sun?.dayLength || '12h 00m',
+            },
+          });
         }
       }
     },
