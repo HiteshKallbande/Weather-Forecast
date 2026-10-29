@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import HeroWeather from './components/HeroWeather';
 import HourlyForecast from './components/HourlyForecast';
+import SunMoonTracker from './components/SunMoonTracker';
 import DailyForecast from './components/DailyForecast';
 import MetricsPanel from './components/MetricsPanel';
 import { AlertTriangle, RefreshCw, X } from 'lucide-react';
@@ -87,6 +88,12 @@ function DashboardContent() {
                 <HourlyForecast
                   hourly={activeLocation?.hourly}
                   unit={unit}
+                  accentColor={activeLocation?.accentColor}
+                />
+                <SunMoonTracker
+                  sun={activeLocation?.sun}
+                  moon={activeLocation?.moon}
+                  localTime={activeLocation?.localTime}
                   accentColor={activeLocation?.accentColor}
                 />
                 <DailyForecast daily={activeLocation?.daily} unit={unit} />
